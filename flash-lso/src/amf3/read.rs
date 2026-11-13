@@ -184,6 +184,13 @@ impl AMF3Decoder {
             .insert(name.to_string(), Rc::new(T::default()));
     }
 
+    /// Shared with `AMF0Decoder` so embedded AMF3 sub-elements never collide with AMF0 ids.
+    pub const fn next_object_id(&mut self) -> ObjectId {
+        let id = ObjectId(self.object_id);
+        self.object_id += 1;
+        id
+    }
+
     fn parse_element_string<'a>(&mut self, i: &'a [u8]) -> AMFResult<'a, Value> {
         let (i, s) = map(|i| self.parse_string(i), Value::String).parse(i)?;
         Ok((i, (s)))
